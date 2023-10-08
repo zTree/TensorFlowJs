@@ -7,17 +7,14 @@ export const MediaStyles = {
 
 export const DrawerWidth = 200;
 
-export const MenuList = [
+export interface MenuItem {
+  id: string;
+  path: string;
+}
+
+export const MenuList: MenuItem[] = [
   {
-    name: "Home",
+    id: "leftMenu.homepage",
     path: "/",
-  },
-  {
-    name: "About",
-    path: "/about",
-  },
-  {
-    name: "Contact",
-    path: "/contact",
-  },
+  }
 ]

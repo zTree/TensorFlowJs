@@ -4,5 +4,8 @@
     "name": "Language",
     "zh": "Chinese",
     "en": "English"
+  },
+  "leftMenu": {
+    "homepage": "HomePage"
   }
 }

@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DrawerWidth, MediaStyles } from "../common/config";
 import Head from "../component/Head";
-import LeftMenu from "../component/LeftMenu1";
+import LeftMenu from "../component/LeftMenu";
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
