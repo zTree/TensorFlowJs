@@ -3,12 +3,9 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar, { ToolbarProps } from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import { DrawerWidth, MediaStyles } from "../common/config";
-import LeftMenu from "../component/leftMenu";
+import Head from "../component/Head";
+import LeftMenu from "../component/LeftMenu1";
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
@@ -57,15 +54,6 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const HeadToolbar = styled(Toolbar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})<ToolbarProps>(() => ({
-   minHeight: '56px',
-   [MediaStyles.isPC]: {
-     minHeight: '56px',
-  },
-}));
-
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -89,20 +77,7 @@ const Root = memo(() => {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <HeadToolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Title
-          </Typography>
-        </HeadToolbar>
+        <Head open={open} handleDrawerOpen={handleDrawerOpen} />
       </AppBar>
       <Fragment key={'left'}>
         <LeftMenu open={open} handleDrawerClose={handleDrawerClose} />
