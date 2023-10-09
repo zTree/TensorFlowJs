@@ -4,8 +4,9 @@ import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { DrawerWidth, MediaStyles } from "../common/config";
-import Head from "../component/Head";
-import LeftMenu from "../component/LeftMenu";
+import Head from "../component/head_bar";
+import LeftMenu from "../component/left_menu";
+import MainRouter from "../component/main_router";
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
@@ -84,9 +85,7 @@ const Root = memo(() => {
       </Fragment>
       <Main open={open}>
         <DrawerHeader />
-        <div>
-          aaaa
-        </div>
+        <MainRouter />
       </Main>
     </Box>
   );
