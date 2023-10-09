@@ -38,6 +38,9 @@ const LeftMenu = memo((props: LeftMenuProps) => {
 
   const handleClick = (item: MenuItem) => {
     console.log(item);
+    if (item.id === 'leftMenu.homepage') {
+      window.location.href = '/';
+    }
   }
 
   return (
