@@ -1,4 +1,5 @@
 import { Fragment, memo, useState } from "react";
+import { BrowserRouter } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -75,19 +76,21 @@ const Root = memo(() => {
     setOpen(false);
   };
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Head open={open} handleDrawerOpen={handleDrawerOpen} />
-      </AppBar>
-      <Fragment key={'left'}>
-        <LeftMenu open={open} handleDrawerClose={handleDrawerClose} />
-      </Fragment>
-      <Main open={open}>
-        <DrawerHeader />
-        <MainRouter />
-      </Main>
-    </Box>
+    <BrowserRouter>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBar position="fixed" open={open}>
+          <Head open={open} handleDrawerOpen={handleDrawerOpen} />
+        </AppBar>
+        <Fragment key={'left'}>
+          <LeftMenu open={open} handleDrawerClose={handleDrawerClose} />
+        </Fragment>
+        <Main open={open}>
+          <DrawerHeader />
+          <MainRouter />
+        </Main>
+      </Box>
+    </BrowserRouter>
   );
 });
 

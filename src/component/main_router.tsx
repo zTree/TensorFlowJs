@@ -1,26 +1,26 @@
 import { memo } from "react";
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Empty from "./empty";
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { BasePath, WebPath } from "../common/config";
+import Test from "./content/test";
 
 // interface MainRouterProps {
 // }
 
 const routes = [
   {
-    path: process.env.VITE_BASE_PATH,
-    render: Empty,
+    path: `${BasePath}${WebPath.Test}`,
+    render: Test,
   },
 ];
 const MainRouter = memo(() => {
-  
+  console.log(routes);
   return (
-    <BrowserRouter>
-      <Routes>
-        {routes.map((data, index) =>
-          <Route key={`${data.path}_${index}`} path={data.path} element={<data.render />} />
-        )}
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      {routes.map((data, index) =>
+        <Route key={`${data.path}_${index}`} path={data.path} element={<data.render />} />
+      )}
+      <Route path='*' element={<Navigate to={`${BasePath}${WebPath.Test}`} />} />
+    </Routes>
   );
  
 });

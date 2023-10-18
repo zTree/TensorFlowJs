@@ -9,14 +9,35 @@ export const MediaStyles = {
   isPC: `@media (min-width: ${CustomTheme.MobileMaxWidth}px)`,
 };
 
-export interface MenuItem {
-  id: string;
-  path: string;
+export enum MenuID {
+  Homepage = 'leftMenu.homepage',
+  Test = 'leftMenu.test',
 }
+
+export enum WebPath {
+  Homepage = '/',
+  Test = '/test',
+}
+
+export interface MenuItem {
+  id: MenuID;
+  path: WebPath;
+  fullPath: string;
+}
+
+export const BasePath = process.env.VITE_BASE_PATH || '/';
 
 export const MenuList: MenuItem[] = [
   {
-    id: "leftMenu.homepage",
-    path: "/",
-  }
+    id: MenuID.Homepage,
+    path: WebPath.Homepage,
+    fullPath: WebPath.Homepage,
+
+  },
+  {
+    id: MenuID.Test,
+    path: WebPath.Test,
+    fullPath: `${BasePath}${WebPath.Test}`,
+  },
+
 ]

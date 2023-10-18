@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { styled, useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
@@ -10,7 +11,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { CustomTheme, MediaStyles, MenuItem, MenuList } from "../common/config";
+import { CustomTheme, MediaStyles, MenuID, MenuItem, MenuList } from "../common/config";
 
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -32,13 +33,20 @@ interface LeftMenuProps {
 }
 
 const LeftMenu = memo((props: LeftMenuProps) => {
+  const history = useNavigate();
   const theme = useTheme();
   const { t } = useTranslation();
   const { open, handleDrawerClose } = props;
 
   const handleClick = (item: MenuItem) => {
-    if (item.id === 'leftMenu.homepage') {
-      window.location.href = '/';
+    switch (item.id) {
+      case MenuID.Homepage:
+        window.location.href = item.fullPath;
+        break;
+      case MenuID.Test:
+      default:
+        history(item.fullPath);
+        break;
     }
   }
 
