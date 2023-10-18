@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import { DrawerWidth, MediaStyles } from "../common/config";
+import { CustomTheme, MediaStyles } from "../common/config";
 import Head from "../component/head_bar";
 import LeftMenu from "../component/left_menu";
 import MainRouter from "../component/main_router";
@@ -18,9 +18,9 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     duration: theme.transitions.duration.leavingScreen,
   }),
   [MediaStyles.isMobile]: {
-    marginLeft: `-${DrawerWidth}px`,
+    marginLeft: `-${CustomTheme.DrawerWidth}px`,
   },
-  marginLeft: `-${DrawerWidth}px`,
+  marginLeft: `-${CustomTheme.DrawerWidth}px`,
   ...(open && {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.easeOut,
@@ -46,8 +46,8 @@ const AppBar = styled(MuiAppBar, {
     marginLeft: `0px`,
   },
   ...(open && {
-    width: `calc(100% - ${DrawerWidth}px)`,
-    marginLeft: `${DrawerWidth}px`,
+    width: `calc(100% - ${CustomTheme.DrawerWidth}px)`,
+    marginLeft: `${CustomTheme.DrawerWidth}px`,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,

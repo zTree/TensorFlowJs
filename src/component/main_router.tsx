@@ -7,7 +7,7 @@ import Empty from "./empty";
 
 const routes = [
   {
-    path: 'tensorflow/', // 后端已经修改了邮箱邀请链接地址，这个的旧路由是为了兼容旧的链接，后续可以删除
+    path: process.env.VITE_BASE_PATH,
     render: Empty,
   },
 ];

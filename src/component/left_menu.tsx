@@ -10,19 +10,19 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { DrawerWidth, MediaStyles, MenuItem, MenuList } from "../common/config";
+import { CustomTheme, MediaStyles, MenuItem, MenuList } from "../common/config";
 
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(0, 1),
-  minHeight: '56px',
+  minHeight: CustomTheme.HeaderHeight,
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
   [MediaStyles.isPC]: {
-    minHeight: '56px',
+    minHeight: CustomTheme.HeaderHeight,
   },
 }));
 
@@ -45,10 +45,10 @@ const LeftMenu = memo((props: LeftMenuProps) => {
   return (
     <Drawer
       sx={{
-        width: DrawerWidth,
+        width: CustomTheme.DrawerWidth,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-          width: DrawerWidth,
+          width: CustomTheme.DrawerWidth,
           boxSizing: 'border-box',
         },
       }}

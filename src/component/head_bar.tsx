@@ -5,7 +5,7 @@ import Toolbar, { ToolbarProps } from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import { MediaStyles } from "../common/config";
+import { CustomTheme, MediaStyles } from "../common/config";
 import { MenuItem, Select, SelectChangeEvent, SelectProps } from "@mui/material";
 
 interface HeadProps {
@@ -16,11 +16,11 @@ interface HeadProps {
 const HeadToolbar = styled(Toolbar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })<ToolbarProps>(() => ({
-  minHeight: '56px',
+  minHeight: CustomTheme.HeaderHeight,
   display: 'flex',
   flexDirection: 'row',
   [MediaStyles.isPC]: {
-    minHeight: '56px',
+    minHeight: CustomTheme.HeaderHeight,
   },
 }));
 
