@@ -13,7 +13,6 @@ const routes = [
   },
 ];
 const MainRouter = memo(() => {
-  console.log(routes);
   return (
     <Routes>
       {routes.map((data, index) =>
