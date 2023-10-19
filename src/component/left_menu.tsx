@@ -43,7 +43,7 @@ const LeftMenu = memo((props: LeftMenuProps) => {
       case MenuID.Homepage:
         window.location.href = item.fullPath;
         break;
-      case MenuID.Test:
+      case MenuID.DigitRecognition:
       default:
         history(item.fullPath);
         break;

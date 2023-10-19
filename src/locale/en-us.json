@@ -7,6 +7,6 @@
   },
   "leftMenu": {
     "homepage": "HomePage",
-    "test": "Test"
+    "digitRecognition": "Handwritten digit recognition"
   }
 }

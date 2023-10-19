@@ -11,12 +11,12 @@ export const MediaStyles = {
 
 export enum MenuID {
   Homepage = 'leftMenu.homepage',
-  Test = 'leftMenu.test',
+  DigitRecognition = 'leftMenu.digitRecognition',
 }
 
 export enum WebPath {
   Homepage = '/',
-  Test = '/test',
+  DigitRecognition = '/digit_recognition',
 }
 
 export interface MenuItem {
@@ -35,9 +35,9 @@ export const MenuList: MenuItem[] = [
 
   },
   {
-    id: MenuID.Test,
-    path: WebPath.Test,
-    fullPath: `${BasePath}${WebPath.Test}`,
+    id: MenuID.DigitRecognition,
+    path: WebPath.DigitRecognition,
+    fullPath: `${BasePath}${WebPath.DigitRecognition}`,
   },
 
 ]
