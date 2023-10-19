@@ -12,6 +12,8 @@ import MainRouter from "../component/main_router";
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   open?: boolean;
 }>(({ theme, open }) => ({
+  display: 'flex',
+  flexDirection: 'column',
   flexGrow: 1,
   padding: 0,
   transition: theme.transitions.create('margin', {
@@ -81,7 +83,7 @@ const Root = memo(() => {
   };
   return (
     <BrowserRouter>
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', height: '100%', }}>
         <CssBaseline />
         <AppBar position="fixed" open={open}>
           <Head open={open} handleDrawerOpen={handleDrawerOpen} />
