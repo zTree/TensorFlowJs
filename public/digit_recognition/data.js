@@ -103,15 +103,16 @@ export class MnistData {
 
   nextTrainBatch(batchSize) {
     return this.nextBatch(
-        batchSize, [this.trainImages, this.trainLabels], () => {
-          this.shuffledTrainIndex =
-              (this.shuffledTrainIndex + 1) % this.trainIndices.length;
-          return this.trainIndices[this.shuffledTrainIndex];
-        });
+      batchSize, [this.trainImages, this.trainLabels], () => {
+        this.shuffledTrainIndex =
+            (this.shuffledTrainIndex + 1) % this.trainIndices.length;
+        return this.trainIndices[this.shuffledTrainIndex];
+      });
   }
 
   nextTestBatch(batchSize) {
-    return this.nextBatch(batchSize, [this.testImages, this.testLabels], () => {
+    return this.nextBatch(
+      batchSize, [this.testImages, this.testLabels], () => {
       this.shuffledTestIndex =
           (this.shuffledTestIndex + 1) % this.testIndices.length;
       return this.testIndices[this.shuffledTestIndex];

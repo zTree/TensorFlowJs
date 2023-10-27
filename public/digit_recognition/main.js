@@ -65,7 +65,7 @@ function getModel() {
 async function train(model, data) {
   const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
   const container = {
-    name: 'Model Training', tab: 'Model', styles: { height: '1000px' }
+    name: 'Model Training', tab: 'Evaluation', styles: { height: '1000px' }
   };
   const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
 
@@ -113,19 +113,19 @@ function doPrediction(model, data, testDataSize = 500) {
   return [preds, labels];
 }
 
-async function showAccuracy(model, data) {
+async function showAccuracy(id, model, data) {
   const [preds, labels] = doPrediction(model, data);
   const classAccuracy = await tfvis.metrics.perClassAccuracy(labels, preds);
-  const container = {name: 'Accuracy', tab: 'Evaluation'};
+  const container = {name: `Accuracy-${id}`, tab: 'Evaluation'};
   tfvis.show.perClassAccuracy(container, classAccuracy, classNames);
 
   labels.dispose();
 }
 
-async function showConfusion(model, data) {
+async function showConfusion(id, model, data) {
   const [preds, labels] = doPrediction(model, data);
   const confusionMatrix = await tfvis.metrics.confusionMatrix(labels, preds);
-  const container = {name: 'Confusion Matrix', tab: 'Evaluation'};
+  const container = {name: `Confusion Matrix-${id}`, tab: 'Evaluation'};
   tfvis.render.confusionMatrix(container, {values: confusionMatrix, tickLabels: classNames});
 
   labels.dispose();
@@ -161,17 +161,29 @@ async function showExamples(data) {
   }
 }
 
+function showTF() {
+  tfvis.visor().open();
+}
+
 async function run() {
-  const data = new MnistData();
+  let data = new MnistData();
   await data.load();
   await showExamples(data);
 
   const model = getModel();
-  tfvis.show.modelSummary({name: 'Model Architecture', tab: 'Model'}, model);
+  
+  await showAccuracy('before', model, data);
+  await showConfusion('before', model, data);
+  
+  tfvis.show.modelSummary({name: 'Model Architecture', tab: 'Evaluation'}, model);
   await train(model, data);
 
-  await showAccuracy(model, data);
-  await showConfusion(model, data);
+  data = new MnistData();
+  await data.load();
+  // tfvis.visor().setActiveTab('Evaluation');
+  await showAccuracy('after', model, data);
+  await showConfusion('after', model, data);
 }
 
 document.addEventListener('DOMContentLoaded', run);
+window.showTF = showTF;

@@ -1,7 +1,7 @@
 import { memo, useRef, useEffect } from "react";
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { styled } from '@mui/material/styles';
-import { BasePath } from "../../common/config";
+import { BasePath, MenuID } from "../../common/config";
 
 // import { CustomTheme, MediaStyles } from "../../common/config";
 
@@ -22,7 +22,7 @@ const Iframe = styled('iframe')(() => ({
 
 let iframeInitial = false;
 const DigitRecognition = memo((props: DigitRecognitionProps) => {
-  // const { t } = useTranslation();
+  const { t } = useTranslation();
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -32,7 +32,6 @@ const DigitRecognition = memo((props: DigitRecognitionProps) => {
     const iframe = iframeRef.current;
     if (iframe) {
       iframeInitial = true;
-      console.log(iframe);
 
       let doc = null;
       if(iframe.contentDocument) {
@@ -52,7 +51,13 @@ const DigitRecognition = memo((props: DigitRecognitionProps) => {
   html, body {
     height: 100%;
     margin: 0;
-    padding: 0;
+    padding: 0;    
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    padding: 20px;
   }
   </style>
 
@@ -69,6 +74,8 @@ const DigitRecognition = memo((props: DigitRecognitionProps) => {
 
 </head>
 <body>
+  <h2 id="title">${t(MenuID.DigitRecognition)}</h2>
+  <div style="display: flex; place-content: flex-end;"><button onclick="showTF()">显示</button></div>
 </body>
 </html>`); 
         doc.close(); 
