@@ -23,10 +23,10 @@ const NUM_TRAIN_ELEMENTS = 55000;
 const NUM_TEST_ELEMENTS = NUM_DATASET_ELEMENTS - NUM_TRAIN_ELEMENTS;
 
 const MNIST_IMAGES_SPRITE_PATH =
-    'https://treejs.cn/assets/tensorflow/digit_recognition/mnist_images.png';
+    'https://www.treejs.cn/assets/tensorflow/digit_recognition/mnist_images.png';
     // 'https://storage.googleapis.com/learnjs-data/model-builder/mnist_images.png';
 const MNIST_LABELS_PATH =
-    'https://treejs.cn/assets/tensorflow/digit_recognition/mnist_labels_uint8';
+    'https://www.treejs.cn/assets/tensorflow/digit_recognition/mnist_labels_uint8';
     // 'https://storage.googleapis.com/learnjs-data/model-builder/mnist_labels_uint8';
 
 /**
