@@ -178,8 +178,6 @@ async function run() {
   tfvis.show.modelSummary({name: 'Model Architecture', tab: 'Evaluation'}, model);
   await train(model, data);
 
-  data = new MnistData();
-  await data.load();
   // tfvis.visor().setActiveTab('Evaluation');
   await showAccuracy('after', model, data);
   await showConfusion('after', model, data);
