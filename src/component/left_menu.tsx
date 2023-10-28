@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { styled, useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
@@ -33,10 +33,13 @@ interface LeftMenuProps {
 }
 
 const LeftMenu = memo((props: LeftMenuProps) => {
-  const history = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
   const { t } = useTranslation();
   const { open, handleDrawerClose } = props;
+
+  console.log(location.pathname, MenuList);
 
   const handleClick = (item: MenuItem) => {
     switch (item.id) {
@@ -45,7 +48,7 @@ const LeftMenu = memo((props: LeftMenuProps) => {
         break;
       case MenuID.DigitRecognition:
       default:
-        history(item.fullPath);
+        navigate(item.fullPath);
         break;
     }
   }
@@ -73,7 +76,7 @@ const LeftMenu = memo((props: LeftMenuProps) => {
       <List>
         {MenuList.map((item) => (
           <ListItem key={item.path} disablePadding>
-            <ListItemButton onClick={() => {handleClick(item);}}>
+            <ListItemButton onClick={() => {handleClick(item);}} selected={location.pathname === item.fullPath}>
               <ListItemText primary={t(item.id)} />
             </ListItemButton>
           </ListItem>
