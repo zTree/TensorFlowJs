@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * @license
  * Copyright 2018 Google LLC. All Rights Reserved.

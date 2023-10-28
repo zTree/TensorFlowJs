@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-undef */
 import {MnistData} from './data.js';
 
 //---------------------------------------------------------------------
@@ -165,11 +167,21 @@ function showTF() {
   tfvis.visor().open();
 }
 
+let data = new MnistData();
+let dataLoaded = false;
+
 async function run() {
-  let data = new MnistData();
   await data.load();
   await showExamples(data);
+  dataLoaded = true;
+  document.dispatchEvent(new Event('digit-data-ready'))
+  window.parent.document.dispatchEvent(new Event('digit-data-ready'))
+}
 
+async function startTrain() {
+  if (!dataLoaded) {
+    return;
+  }
   const model = getModel();
   
   await showAccuracy('before', model, data);
@@ -185,3 +197,4 @@ async function run() {
 
 document.addEventListener('DOMContentLoaded', run);
 window.showTF = showTF;
+window.startTrain = startTrain;

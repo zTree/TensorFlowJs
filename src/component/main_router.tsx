@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { BasePath, WebPath } from "../common/config";
-import Test from "./content/digit_recognition";
+import Test from "./content/digit_recognition/digit_recognition";
 
 // interface MainRouterProps {
 // }

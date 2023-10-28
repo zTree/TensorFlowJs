@@ -1,19 +1,10 @@
 import { memo, useRef, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { styled } from '@mui/material/styles';
-import { BasePath, MenuID } from "../../common/config";
-
-// import { CustomTheme, MediaStyles } from "../../common/config";
-
-interface DigitRecognitionProps {
-}
+import { BasePath, MenuID } from "../../../common/config";
 
 
-const DigitRecognitionContent = styled('div')({
-  flexGrow: 1,
-});
-
-const Iframe = styled('iframe')(() => ({
+const IframeWrap = styled('iframe')(() => ({
   border: 0,
   verticalAlign: 'bottom',
   width: '100%',
@@ -21,7 +12,7 @@ const Iframe = styled('iframe')(() => ({
 }));
 
 let iframeInitial = false;
-const DigitRecognition = memo((props: DigitRecognitionProps) => {
+const Iframe = memo(() => {
   const { t } = useTranslation();
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -74,38 +65,38 @@ const DigitRecognition = memo((props: DigitRecognitionProps) => {
   <!-- Import the main script file -->
   <script src="${BasePath}/digit_recognition/main.js" type="module"></script>
 
+  <script>
+  function onDataReady() {
+    const trainButton = document.getElementById('train');
+    trainButton.disabled = false;
+  }
+
+  document.addEventListener('digit-data-ready', onDataReady);
+  </script>
+
 </head>
 <body>
   <h2 id="title">${t(MenuID.DigitRecognition)}</h2>
-  <div style="display: flex; place-content: flex-end;"><button onclick="showTF()">显示</button></div>
+  <div style="display: flex; place-content: flex-end;"><button onclick="showTF()">Show</button></div>
+  <div style="display: flex; place-content: flex-start;"><button id="train" onclick="startTrain()" disabled>Start Train</button></div>
 </body>
 </html>`); 
         doc.close(); 
-        // console.log(doc.body?.outerHTML)
-        // const script = doc.createElement('script');
-        // script.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs';
-        // script.onload = () => {
-        //   console.log('tfjs loaded');
-        // };
-        // doc.body.appendChild(script);
       }
 
     }
 
     return () => {
       iframeInitial = false;
-      console.log('unmount iframe');
     }
   });
 
 
   return (
-    <DigitRecognitionContent {...props} >
-      <Iframe id='digit-recognition' ref={iframeRef} />
-    </DigitRecognitionContent>
+    <IframeWrap id='digit-recognition' ref={iframeRef} />
   );
 });
 
-DigitRecognition.displayName = "DigitRecognition";
+Iframe.displayName = "Iframe";
 
-export default DigitRecognition;
+export default Iframe;
