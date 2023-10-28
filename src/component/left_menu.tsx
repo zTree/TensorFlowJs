@@ -39,8 +39,6 @@ const LeftMenu = memo((props: LeftMenuProps) => {
   const { t } = useTranslation();
   const { open, handleDrawerClose } = props;
 
-  console.log(location.pathname, MenuList);
-
   const handleClick = (item: MenuItem) => {
     switch (item.id) {
       case MenuID.Homepage:
