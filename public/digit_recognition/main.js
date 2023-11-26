@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-undef */
-import {MnistData} from './data.js';
+import { MnistData, IMAGE_SIZE } from './data.js';
 
+const IMAGE_WIDTH = 28;
+const IMAGE_HEIGHT = 28;
 //---------------------------------------------------------------------
 function getModel() {
   const model = tf.sequential();
 
-  const IMAGE_WIDTH = 28;
-  const IMAGE_HEIGHT = 28;
   const IMAGE_CHANNELS = 1;
 
   // In the first layer of our convolutional neural network we have
@@ -67,7 +67,7 @@ function getModel() {
 async function train(model, data) {
   const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
   const container = {
-    name: 'Model Training', tab: 'Evaluation', styles: { height: '1000px' }
+    name: 'Model Training', tab: 'Evaluation', styles: { height: 'auto', maxHeight: 'none' }
   };
   const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
 
@@ -110,13 +110,16 @@ function doPrediction(model, data, testDataSize = 500) {
   const testxs = testData.xs.reshape([testDataSize, IMAGE_WIDTH, IMAGE_HEIGHT, 1]);
   const labels = testData.labels.argMax(-1);
   const preds = model.predict(testxs).argMax(-1);
-
   testxs.dispose();
+
+
   return [preds, labels];
 }
 
 async function showAccuracy(id, model, data) {
   const [preds, labels] = doPrediction(model, data);
+  const z = await preds.data();
+  console.log(z);
   const classAccuracy = await tfvis.metrics.perClassAccuracy(labels, preds);
   const container = {name: `Accuracy-${id}`, tab: 'Evaluation'};
   tfvis.show.perClassAccuracy(container, classAccuracy, classNames);
@@ -169,6 +172,7 @@ function showTF() {
 
 let data = new MnistData();
 let dataLoaded = false;
+let model = null;
 
 async function run() {
   await data.load();
@@ -176,13 +180,13 @@ async function run() {
   dataLoaded = true;
   document.dispatchEvent(new Event('digit-data-ready'))
   window.parent.document.dispatchEvent(new Event('digit-data-ready'))
+  model = getModel();
 }
 
 async function startTrain() {
   if (!dataLoaded) {
     return;
   }
-  const model = getModel();
   
   await showAccuracy('before', model, data);
   await showConfusion('before', model, data);
@@ -195,6 +199,25 @@ async function startTrain() {
   await showConfusion('after', model, data);
 }
 
+async function checkCustomImage(imgData) {
+  const batchSize = 1;
+  const batchImagesArray = new Float32Array(batchSize * IMAGE_SIZE);
+
+  for (let i = 0; i < imgData.data.length / 4; i++) {
+    // All channels hold an equal value since the image is grayscale, so
+    // just read the red channel.
+    batchImagesArray[i] = imgData.data[i * 4] / 255;
+  }
+  const xsData = tf.tensor2d(batchImagesArray, [batchSize, IMAGE_SIZE]);
+  const xs = xsData.reshape([batchSize, IMAGE_WIDTH, IMAGE_HEIGHT, 1]);
+  const preds = model.predict(xs).argMax(-1);
+  xs.dispose();
+  const pred = await preds.data();
+  return pred;
+}
+
+
 document.addEventListener('DOMContentLoaded', run);
 window.showTF = showTF;
 window.startTrain = startTrain;
+window.checkCustomImage = checkCustomImage;

@@ -50,6 +50,13 @@ const Iframe = memo(() => {
   body {
     padding: 20px;
   }
+  #svg-container {
+     
+    overflow: hidden;
+    width: 300px;
+    height: 300px;
+    border: 2px silver solid;
+  }
   </style>
 
   <!-- Import TensorFlow.js -->
@@ -65,20 +72,18 @@ const Iframe = memo(() => {
   <!-- Import the main script file -->
   <script src="${BasePath}/digit_recognition/main.js" type="module"></script>
 
-  <script>
-  function onDataReady() {
-    const trainButton = document.getElementById('train');
-    trainButton.disabled = false;
-  }
+  <script src="${BasePath}/digit_recognition/custom.js" type="module"></script>
 
-  document.addEventListener('digit-data-ready', onDataReady);
-  </script>
 
 </head>
 <body>
   <h2 id="title">${t(MenuID.DigitRecognition)}</h2>
   <div style="display: flex; place-content: flex-end;"><button onclick="showTF()">Show</button></div>
-  <div style="display: flex; place-content: flex-start;"><button id="train" onclick="startTrain()" disabled>Start Train</button></div>
+  <div style="display: flex; place-content: flex-start;"><button id="clear">clear</button> <button id="train" onclick="startTrain()" disabled>Start Train</button></div>
+  <div>
+    <div id="svg-container"></div>
+    <div id="svg-result"></div>
+  </div>
 </body>
 </html>`); 
         doc.close(); 

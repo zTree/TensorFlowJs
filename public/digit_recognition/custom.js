@@ -1,0 +1,237 @@
+class SvgWriting {
+  svgNS = "http://www.w3.org/2000/svg";
+  svg = undefined;
+  currentSize = 10;
+  currentColor = '#666666';
+  draggedObject = null;
+  deferredMovement = null;
+  dragging = false;
+  svgWritingPaper = null;
+  svgWritingDraft = null;
+  onWriten = null;
+  resultContainer = null;
+  
+  constructor(options, onWriten) {
+    const {container, result} = options;
+    this.resultContainer = result;
+    container.innerHTML = '<svg class="svg-writing" style="cursor:crosshair;background:white;width: 100%;height: 100%;margin: 0;overflow: hidden;"><g class="svg-writing-paper" transform="translate(0,0) scale(1 1)"></g><g class="svg-writing-draft" transform="translate(0,0) scale(1 1)"></g></svg>';
+    this.svgWritingPaper = container.querySelector('.svg-writing-paper');
+    this.svgWritingDraft = container.querySelector('.svg-writing-draft');
+    this.svg = container.getElementsByTagName("svg")[0];
+    this.svg.onmousedown = this.handles.mousedown;
+    this.onWriten = onWriten;
+  }
+
+  getEventCoordsRelativeToDoc = (e) => {
+    const pageCoords = this.svg.createSVGPoint();
+    const svgRect = this.svg.getBoundingClientRect();
+    pageCoords.x = e.pageX - svgRect.left - window.pageXOffset;
+    pageCoords.y = e.pageY - svgRect.top - window.pageYOffset;
+    const transforms = this.svgWritingPaper.transform.animVal;
+    const m = transforms.getItem(1).matrix.inverse().multiply(
+      transforms.getItem(0).matrix.inverse());
+    const docCoords = pageCoords.matrixTransform(m);
+    return docCoords;
+  }
+
+  removeAllChildren = (node) => {
+    const cs = node.childNodes;
+    for (let i = cs.length - 1; i >= 0; i--) {
+      node.removeChild(cs[i]);
+    }
+  }
+
+  clear = () => {
+    this.removeAllChildren(this.svgWritingPaper);
+    this.removeAllChildren(this.svgWritingDraft);
+  }
+
+  getWritingSvg = () => {
+    const svgBak = this.svg.cloneNode(true);
+    svgBak.removeChild(svgBak.querySelector('.svg-writing-draft'));
+    const paths = this.svg.querySelectorAll('path');
+    const space = 20;
+    const rect = this.svg.getBoundingClientRect();
+    let minX = rect.width;
+    let minY = rect.height;
+    let maxX = 0;
+    let maxY = 0;
+    
+    paths.forEach(function (path) {
+      const bbox = path.getBBox();
+      minX = Math.max(0, Math.min(minX, bbox.x - space));
+      minY = Math.max(0, Math.min(minY, bbox.y - space));
+      maxX = Math.min(rect.width, Math.max(maxX, bbox.x + bbox.width + space));
+      maxY = Math.min(rect.height, Math.max(maxY, bbox.y + bbox.height + space));
+    });
+    const width = Math.max(maxX - minX, maxY - minY);
+    const height = width;
+    svgBak.setAttribute('viewBox', `${minX} ${minY} ${maxX - minX} ${maxY - minY}`);
+    svgBak.setAttribute('width', width);
+    svgBak.setAttribute('height', height);
+    svgBak.style.width = `${width}px`;
+    svgBak.style.height = `${height}px`;
+    return svgBak;
+  }
+
+  filter = (imgData) => {
+    let data = imgData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      var avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+      data[i] = data[i + 1] = data[i + 2] = avg >= 125 ? 0 : 255;
+    }
+    return imgData;
+  }
+
+  getImageData = (w, h) => {
+    return new Promise((resolve, reject) => {
+      this.resultContainer.innerHTML = '';
+      const svgBak = this.getWritingSvg();
+      // this.resultContainer.appendChild(svgBak);
+      const width = svgBak.getAttribute('width');
+      const height = svgBak.getAttribute('height');
+      const svgData = new XMLSerializer().serializeToString(svgBak);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(w/width, h/height);
+      ctx.clearRect(0, 0, width, height);
+      const img = new Image();
+      img.setAttribute("src", "data:image/svg+xml;base64," + btoa(svgData));
+      // this.resultContainer.appendChild(img);
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        const imgData = this.filter(ctx.getImageData(0, 0, width, height));
+        ctx.putImageData(imgData, 0, 0)
+        this.resultContainer.appendChild(canvas);
+        resolve(ctx.getImageData(0, 0, w, h));
+      };
+      img.onerror = reject
+    });
+  }
+
+
+  prefixProperty = (pre, prop) => {
+    return pre + prop.replace(/^[a-z]/, function (l) { return l.toUpperCase(); });
+  }
+
+  tryPrefixes = (obj, prop) => {
+    if (prop in obj) {
+      return obj[prop];
+    } else if (this.prefixProperty('moz', prop) in obj) {
+      return obj[this.prefixProperty('moz', prop)];
+    } else if (this.prefixProperty('webkit', prop) in obj) {
+      return obj[this.prefixProperty('webkit', prop)];
+    } else {
+      return undefined;
+    }
+  }
+
+  handles = {
+    mousedown: (e) => {
+      const docCoords = this.getEventCoordsRelativeToDoc(e);
+      e.stopPropagation();
+      this.tools.onmousedown(e, docCoords);
+      document.addEventListener('mousemove', this.handles.mousemove);
+      document.addEventListener('mouseup', this.handles.mouseup);
+
+    },  
+    mousemove: (e) => {
+      if (this.draggedObject != null) {
+        e.stopPropagation();
+        const currentMovement = this.svg.createSVGPoint();
+        currentMovement.x = this.tryPrefixes(e, 'movementX');
+        currentMovement.y = this.tryPrefixes(e, 'movementY');
+        this.tools.onmousemove(e, currentMovement);
+        this.svgWritingDraft.setAttribute("transform", this.svgWritingPaper.getAttribute("transform"));
+      }
+    },
+    mouseup: (e) => {
+      document.removeEventListener('mousemove', this.handles.mousemove);
+      document.removeEventListener('mouseup', this.handles.mouseup);
+      if (this.draggedObject != null) {
+        e.stopPropagation();
+        this.tools.onmouseup(e);
+        this.draggedObject = null;
+      }
+      if (this.onWriten) {
+        this.onWriten();
+      }
+    }
+  }
+
+  tools = {
+    onmousedown: (e, docCoords) => {
+      this.draggedObject = document.createElementNS(this.svgNS, 'path');
+      this.draggedObject.setAttribute('d', 'M ' + docCoords.x + ' ' + docCoords.y);
+      this.draggedObject.setAttribute('stroke', this.currentColor);
+      this.draggedObject.setAttribute('stroke-width', this.currentSize * 2);
+      this.draggedObject.setAttribute('style', 'fill: none; stroke-linejoin: round; stroke-linecap: round;');
+      this.svgWritingDraft.appendChild(this.draggedObject);
+      this.deferredMovement = { x: 0, y: 0 };
+    },
+    onmousemove: (e, currentMovement) => {
+      const zoomMatrix = this.svgWritingPaper.transform.animVal.getItem(1).matrix;
+      currentMovement = currentMovement.matrixTransform(zoomMatrix.inverse());
+      this.deferredMovement = {
+        x: this.deferredMovement.x + currentMovement.x,
+        y: this.deferredMovement.y + currentMovement.y
+      };
+      if (Math.abs(this.deferredMovement.x) > this.currentSize ||
+        Math.abs(this.deferredMovement.y) > this.currentSize
+      ) {
+        let d = this.draggedObject.getAttribute('d');
+        if (!this.dragging) {
+          d += ' l';
+          this.dragging = true;
+        }
+        d += ' ' + this.deferredMovement.x + ' ' + this.deferredMovement.y;
+        this.deferredMovement = { x: 0, y: 0 };
+        this.draggedObject.setAttribute('d', d);
+      }
+    },
+    onmouseup: () => {
+      this.svgWritingDraft.removeChild(this.draggedObject);
+      if (this.dragging) {
+        this.svgWritingPaper.appendChild(this.draggedObject);
+        if (this.deferredMovement.x != 0 || this.deferredMovement.y != 0) {
+          let d = this.draggedObject.getAttribute('d');
+          d += ' l ' + this.deferredMovement.x + ' ' + this.deferredMovement.y;
+          this.draggedObject.setAttribute('d', d);
+        }
+      }
+      this.dragging = false;
+      this.deferredMovement = null;
+    }
+  }
+}
+
+let svgWriting = null;
+let svgResult = null;
+async function onWriten() {
+  const imgData = await svgWriting.getImageData(28, 28);
+  console.log(imgData);
+  const pred = await window.checkCustomImage(imgData);
+  const span = document.createElement('span');
+  span.innerHTML = `Result is ${pred}`;
+  svgResult.appendChild(span);
+}
+
+function onDataReady() {
+  const trainButton = document.getElementById('train');
+  trainButton.disabled = false;
+  svgResult = document.getElementById('svg-result');
+  svgWriting = new SvgWriting({
+    container: document.getElementById('svg-container'),
+    result: svgResult
+  }, onWriten); 
+  const clearButton = document.getElementById('clear');
+  clearButton.onclick = () => {
+    svgWriting.clear();
+  }
+}
+
+document.addEventListener('digit-data-ready', onDataReady);
+
+

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<head>
+  <meta charset="UTF-8">
+  <style type="text/css" id="icon-style">
+    html,
+    body,
+    svg {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #svg-container {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #doc-and-selection path {
+      fill: none;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+  </style>
+  <script type="text/javascript">
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const xlinkNS = "http://www.w3.org/1999/xlink";
+    let svg = undefined;
+    const currentSize = 5;
+    const currentColor = '#666666';
+    let draggedObject = null;
+    let deferredMovement = null;
+    let dragging = false;
+
+    function getEventCoordsRelativeToDoc(e) {
+      const pageCoords = svg.createSVGPoint();
+      pageCoords.x = e.pageX;
+      pageCoords.y = e.pageY;
+      const transforms = doc.transform.animVal;
+      const m = transforms.getItem(1).matrix.inverse().multiply(
+        transforms.getItem(0).matrix.inverse());
+      const docCoords = pageCoords.matrixTransform(m);
+      return docCoords;
+    }
+
+    function removeAllChildren(node) {
+      const cs = node.childNodes;
+      for (let i = cs.length - 1; i >= 0; i--) {
+        node.removeChild(cs[i]);
+      }
+    }
+
+    function clearDocument() {
+      removeAllChildren(doc);
+      removeAllChildren(selection);
+    }
+
+    const tools = {
+      onmousedown: function (e, docCoords) {
+        draggedObject = document.createElementNS(svgNS, 'path');
+        draggedObject.setAttribute('d', 'M ' + docCoords.x + ' ' + docCoords.y);
+        draggedObject.setAttribute('stroke', currentColor);
+        draggedObject.setAttribute('stroke-width', currentSize * 2);
+        selection.appendChild(draggedObject);
+        deferredMovement = { x: 0, y: 0 };
+      },
+      onmousemove: function (e, currentMovement) {
+        const zoomMatrix = doc.transform.animVal.getItem(1).matrix;
+        currentMovement = currentMovement.matrixTransform(zoomMatrix.inverse());
+        deferredMovement = {
+          x: deferredMovement.x + currentMovement.x,
+          y: deferredMovement.y + currentMovement.y
+        };
+        if (Math.abs(deferredMovement.x) > currentSize ||
+          Math.abs(deferredMovement.y) > currentSize
+        ) {
+          let d = draggedObject.getAttribute('d');
+          if (!dragging) {
+            d += ' l';
+            dragging = true;
+          }
+          d += ' ' + deferredMovement.x + ' ' + deferredMovement.y;
+          deferredMovement = { x: 0, y: 0 };
+          draggedObject.setAttribute('d', d);
+        }
+      },
+      onmouseup: function (e) {
+        selection.removeChild(draggedObject);
+        if (dragging) {
+          doc.appendChild(draggedObject);
+          if (deferredMovement.x != 0 || deferredMovement.y != 0) {
+            let d = draggedObject.getAttribute('d');
+            d += ' l ' + deferredMovement.x + ' ' + deferredMovement.y;
+            draggedObject.setAttribute('d', d);
+          }
+        }
+        dragging = false;
+        deferredMovement = null;
+      }
+    };
+
+    function prefixProperty(pre, prop) {
+      return pre + prop.replace(/^[a-z]/, function (l) { return l.toUpperCase(); });
+    }
+
+    function tryPrefixes(obj, prop) {
+      if (prop in obj) {
+        return obj[prop];
+      } else if (prefixProperty('moz', prop) in obj) {
+        return obj[prefixProperty('moz', prop)];
+      } else if (prefixProperty('webkit', prop) in obj) {
+        return obj[prefixProperty('webkit', prop)];
+      } else {
+        return undefined;
+      }
+    }
+
+    function handleMousedown(e) {
+      const docCoords = getEventCoordsRelativeToDoc(e);
+      e.stopPropagation();
+      tools.onmousedown(e, docCoords);
+    }
+
+    function handleMousemove(e) {
+      if (draggedObject != null) {
+        e.stopPropagation();
+        const currentMovement = svg.createSVGPoint();
+        currentMovement.x = tryPrefixes(e, 'movementX');
+        currentMovement.y = tryPrefixes(e, 'movementY');
+        tools.onmousemove(e, currentMovement);
+        selection.setAttribute("transform", doc.getAttribute("transform"));
+      }
+    }
+
+    function handleMouseup(e) {
+      if (draggedObject != null) {
+        e.stopPropagation();
+        tools.onmouseup(e);
+        draggedObject = null;
+      }
+    }
+
+    window.onload = function () {
+      window.doc = document.getElementById('doc');
+      svg = document.getElementsByTagName("svg")[0];
+      
+      svg.onmousedown = handleMousedown;
+      svg.onmousemove = handleMousemove;
+      svg.onmouseup = handleMouseup;
+    }
+  </script>
+</head>
+
+<body>
+  <canvas id="cursor-canvas" class="invisible" width="32" height="32"></canvas>
+  <div id="svg-container" style="bottom: 0px">
+    <svg>
+      <rect id="background" x="0" y="0" width="100%" height="100%" fill="white"></rect>
+      <g id="doc-and-selection">
+        <g id="doc" transform="translate(0,0) scale(1 1)"></g>
+        <g id="selection-filter">
+          <g id="selection" transform="translate(0,0) scale(1 1)"></g>
+        </g>
+      </g>
+    </svg>
+  </div>
+</body>
+
+</html>
